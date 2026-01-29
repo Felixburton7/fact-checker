@@ -1,12 +1,8 @@
 from __future__ import annotations
 
-import asyncio
 import os
 import sys
-from dataclasses import dataclass
-from typing import Iterable
 
-from agents.mcp import MCPServerManager
 from agents.mcp.server import MCPServerSse, MCPServerStdio, MCPServerStreamableHttp
 from agents.mcp.util import create_static_tool_filter
 
@@ -113,17 +109,3 @@ def build_mcp_servers() -> list[object]:
             tool_filter=workspace_filter,
         ),
     ]
-
-
-@dataclass
-class MCPRuntime:
-    manager: MCPServerManager
-
-    def close(self) -> None:
-        asyncio.run(self.manager.cleanup_all())
-
-
-def connect_mcp_servers(servers: Iterable[object]) -> MCPRuntime:
-    manager = MCPServerManager(list(servers))
-    asyncio.run(manager.connect_all())
-    return MCPRuntime(manager=manager)
