@@ -1,0 +1,1 @@
+"""Checker of facts package."""

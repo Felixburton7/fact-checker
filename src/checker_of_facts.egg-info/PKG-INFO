@@ -1,0 +1,38 @@
+Metadata-Version: 2.4
+Name: checker_of_facts
+Version: 0.1.0
+Summary: Bounded-evidence fact checking with an agent jury.
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: openai>=1.0.0
+Requires-Dist: openai-agents>=0.7.0
+Requires-Dist: httpx>=0.27.0
+Requires-Dist: trafilatura>=1.9.0
+Requires-Dist: pypdf>=4.2.0
+Provides-Extra: dev
+Requires-Dist: mypy; extra == "dev"
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: ruff; extra == "dev"
+
+# checker_of_facts
+
+Bounded-evidence fact checking with a multi-agent jury. Milestone 1 provides a CLI and the core agent workflow with MCP interfaces.
+
+## Quickstart
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+
+factcheck "The Moon is made of cheese."
+```
+
+## Milestone 1 scope
+
+- Claim decomposition
+- Retrieval planning
+- Two collectors (gov/stats + news)
+- Critic and three judges
+- Deterministic local logging via workspace client
+- Strict output contract with citations
