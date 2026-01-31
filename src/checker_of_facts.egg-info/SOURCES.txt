@@ -3,7 +3,12 @@ pyproject.toml
 src/checker_of_facts/__init__.py
 src/checker_of_facts/cli.py
 src/checker_of_facts/config.py
+src/checker_of_facts/data_loader.py
 src/checker_of_facts/engine.py
+src/checker_of_facts/hackathon_agents.py
+src/checker_of_facts/hackathon_cli.py
+src/checker_of_facts/hackathon_engine.py
+src/checker_of_facts/hackathon_models.py
 src/checker_of_facts/models.py
 src/checker_of_facts.egg-info/PKG-INFO
 src/checker_of_facts.egg-info/SOURCES.txt
@@ -14,14 +19,5 @@ src/checker_of_facts.egg-info/top_level.txt
 src/checker_of_facts/agents/__init__.py
 src/checker_of_facts/agents/sdk.py
 src/checker_of_facts/mcp/__init__.py
-src/checker_of_facts/mcp/domain_registry.py
-src/checker_of_facts/mcp/retrieval.py
-src/checker_of_facts/mcp/servers.py
-src/checker_of_facts/mcp/sources.py
 src/checker_of_facts/mcp/workspace.py
-src/checker_of_facts/mcp_servers/__init__.py
-src/checker_of_facts/mcp_servers/retrieval.py
-src/checker_of_facts/mcp_servers/sources.py
-src/checker_of_facts/mcp_servers/workspace.py
-src/checker_of_facts/workspace/__init__.py
 tests/test_engine.py

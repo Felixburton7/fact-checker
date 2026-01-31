@@ -6,9 +6,7 @@ Requires-Python: >=3.11
 Description-Content-Type: text/markdown
 Requires-Dist: openai>=1.0.0
 Requires-Dist: openai-agents>=0.7.0
-Requires-Dist: httpx>=0.27.0
-Requires-Dist: trafilatura>=1.9.0
-Requires-Dist: pypdf>=4.2.0
+Requires-Dist: python-dotenv>=1.0.1
 Provides-Extra: dev
 Requires-Dist: mypy; extra == "dev"
 Requires-Dist: pytest; extra == "dev"
@@ -16,7 +14,21 @@ Requires-Dist: ruff; extra == "dev"
 
 # checker_of_facts
 
-Bounded-evidence fact checking with a multi-agent jury. Milestone 1 provides a CLI and the core agent workflow with MCP interfaces.
+Fact checking with an OpenAI Agents SDK debate. The CLI runs a moderator‑led, 5‑juror debate and produces a structured verdict.
+
+## What this is
+
+Use `checker_of_facts` when you want a **structured** debate and verdict. The system:
+
+- decomposes text into atomic claims
+- runs a deterministic juror debate
+- issues a moderator verdict based on the debate
+
+## How it works (pipeline)
+
+1) **Claim agent** splits the input into atomic claims.
+2) **Jurors** debate in a fixed, deterministic order (each turn considers prior turns).
+3) **Moderator** delivers the final verdict.
 
 ## Quickstart
 
@@ -25,14 +37,28 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -e .
 
+cp .env.example .env
+# edit .env with your keys
+
 factcheck "The Moon is made of cheese."
 ```
 
-## Milestone 1 scope
+## Configuration
 
-- Claim decomposition
-- Retrieval planning
-- Two collectors (gov/stats + news)
-- Critic and three judges
-- Deterministic local logging via workspace client
-- Strict output contract with citations
+Required:
+- `OPENAI_API_KEY`
+
+Optional:
+- `OPENAI_MODEL` (default `gpt-4.1-mini`)
+- `WORKSPACE_DIR` (default `.workspace`)
+
+## Tests
+
+```bash
+.venv/bin/python -m pytest -q
+```
+
+## Notes and limitations
+
+- Verdicts are based on internal model knowledge and can be incorrect or outdated.
+- “Current” claims can change rapidly; treat results as best‑effort.

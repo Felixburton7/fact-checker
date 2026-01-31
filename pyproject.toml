@@ -19,6 +19,7 @@ dev = [
 
 [project.scripts]
 factcheck = "checker_of_facts.cli:main"
+hackathon = "checker_of_facts.hackathon_cli:main"
 
 [tool.ruff]
 line-length = 100

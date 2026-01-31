@@ -1,2 +1,3 @@
 [console_scripts]
 factcheck = checker_of_facts.cli:main
+hackathon = checker_of_facts.hackathon_cli:main
