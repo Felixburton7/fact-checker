@@ -10,7 +10,7 @@ from checker_of_facts.mcp.workspace import FileWorkspace
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Bounded-evidence fact checker")
+    parser = argparse.ArgumentParser(description="Internal-knowledge fact checker")
     parser.add_argument("claim", help="Claim text to fact check")
     parser.add_argument(
         "--workspace",

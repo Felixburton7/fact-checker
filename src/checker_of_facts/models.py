@@ -98,8 +98,8 @@ class FinalVerdict:
 @dataclass(frozen=True)
 class ClaimResult:
     claim: ClaimAtom
-    evidence: list[EvidenceItem]
-    judge_verdicts: list[JudgeVerdict]
+    debate: list["JurorTurn"]
+    moderator_verdict: "ModeratorVerdict"
     final_verdict: FinalVerdict
 
 
@@ -117,3 +117,27 @@ class ManagerDirective:
     source_mix_requirement: str
     require_citations: bool
     notes: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class JurorTurn:
+    juror_id: str
+    persona: str
+    turn_index: int
+    content: str
+    reactions: list["JurorReaction"] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class ModeratorVerdict:
+    label: VerdictLabel
+    confidence: float
+    rationale_bullets: list[str]
+    minority_report: str | None = None
+
+
+@dataclass(frozen=True)
+class JurorReaction:
+    target_juror_id: str
+    target_turn_index: int
+    reaction: Literal["like", "dislike"]

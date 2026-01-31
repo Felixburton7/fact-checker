@@ -3,35 +3,24 @@
 ## Components
 1) Backend (Python)
 - Agents SDK agents
-- MCP client registry (connects to mcp servers)
-- Orchestrator (manager flow)
+- Orchestrator (claim → juror debate → moderator verdict)
 - FastAPI API + SSE event stream
-- Storage: local sqlite/postgres later (runs, evidence packs, outputs)
+- Storage: local sqlite/postgres later (runs, outputs)
 
-2) MCP Servers
-- retrieval.mcp: search/fetch/extract/quote
-- sources.mcp: allowlist + tiers + policy checks
-- workspace.mcp: cache, run logs, evidence pack store/load
-
-3) Frontend (Next.js)
+2) Frontend (Next.js)
 - Run workspace (streaming)
 - Claim list + verdict chips
-- Evidence panel (quotes, metadata, open source)
-- Jury panel (each judge vote + rationale)
+- Debate panel (juror turns + moderator verdict)
 - History (past runs)
 
 ## Strict boundary
-Agents can only call MCP tools for external data.
-Backend can call DB and internal services, but agents see them only through MCP abstractions.
+Agents do not call external tools; all judgments are internal.
 
 ## Streaming model
 Backend emits SSE events:
 - run_started
 - claim_decomposed
-- retrieval_planned
-- evidence_collected
-- evidence_scored
-- judge_voted
-- verdict_aggregated
+- debate_turn
+- moderator_verdict
 - run_completed
 - error

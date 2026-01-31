@@ -1,27 +1,9 @@
-# Trust Policy (Bounded Evidence)
+# Trust Policy (Internal Knowledge)
 
-## Tiers
-Tier A (authoritative / primary)
-- Government/statistical agencies, regulators, courts
-- Academic registries/metadata (Crossref/OpenAlex), PubMed
-- Company primary documents (SEC filings, investor reports)
-
-Tier B (high-quality news / institutions)
-- Reuters, AP, BBC, FT, Economist, etc.
-- Major newspapers with established editorial standards (treated as secondary)
-
-Tier C (reference)
-- Britannica, Wikipedia (supporting context, not sole authority for contentious claims)
+## Scope
+This project does not use external retrieval. Judgments are based on internal model knowledge only.
 
 ## Rules
-- Retrieval tools must enforce allowlisted domains and attach tier metadata.
-- Prefer ≥2 independent sources; prefer including Tier A when feasible.
-- If evidence conflicts, judges must surface the conflict and reduce confidence.
-- No “common knowledge” exceptions. If it matters, cite it.
-
-## Implementation
-- `sources.mcp` owns:
-  - allowlist/denylist
-  - domain→tier mapping
-  - per-claim-type requirements (e.g., medical claims require Tier A)
-- `retrieval.mcp` must refuse to fetch non-allowed domains.
+- If uncertainty is high or the claim is time‑sensitive, judges must reduce confidence.
+- For “current/currently” claims, judges should note that status can change.
+- No external citations or evidence ids are provided.
