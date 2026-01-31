@@ -1,6 +1,7 @@
 README.md
 pyproject.toml
 src/checker_of_facts/__init__.py
+src/checker_of_facts/api.py
 src/checker_of_facts/cli.py
 src/checker_of_facts/config.py
 src/checker_of_facts/data_loader.py

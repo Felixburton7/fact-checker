@@ -8,6 +8,9 @@ dependencies = [
   "openai>=1.0.0",
   "openai-agents>=0.7.0",
   "python-dotenv>=1.0.1",
+  "fastapi>=0.109.0",
+  "uvicorn[standard]>=0.27.0",
+  "pydantic>=2.0.0",
 ]
 
 [project.optional-dependencies]
@@ -20,6 +23,7 @@ dev = [
 [project.scripts]
 factcheck = "checker_of_facts.cli:main"
 hackathon = "checker_of_facts.hackathon_cli:main"
+api = "checker_of_facts.api:main"
 
 [tool.ruff]
 line-length = 100

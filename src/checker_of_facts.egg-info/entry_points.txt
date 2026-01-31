@@ -1,3 +1,4 @@
 [console_scripts]
+api = checker_of_facts.api:main
 factcheck = checker_of_facts.cli:main
 hackathon = checker_of_facts.hackathon_cli:main
