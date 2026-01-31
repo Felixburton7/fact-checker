@@ -42,8 +42,8 @@ class AgentDefinition:
 class HackathonAgentRegistry:
     """Registry of agents for the hackathon debate system."""
     jurors: dict[str, AgentHandle]  # juror_id -> agent
-    moderator_summary: AgentHandle
-    moderator_verdict: AgentHandle
+    moderator: AgentHandle  # Single moderator for summary and guidance
+    final_judge: AgentHandle  # Separate judge for final verdict
 
 
 def build_agent(definition: AgentDefinition) -> AgentHandle:
@@ -60,32 +60,24 @@ def build_agent(definition: AgentDefinition) -> AgentHandle:
     )
 
 
-def build_juror_agent(persona: JurorPersona, model: str = DEFAULT_OPENAI_MODEL) -> AgentHandle:
+def build_juror_agent(persona: JurorPersona, model: str = "gpt-5.2") -> AgentHandle:
     """Build a juror agent with a specific persona."""
-    instructions = f"""You are {persona.name}, a juror in a fact-checking debate.
+    instructions = f"""You are {persona.name} in a lively fact-checking debate.
 
-YOUR PERSONA:
-{persona.description}
+YOUR STYLE: {persona.description}
 
-YOUR TASK:
-You are evaluating whether an EXTERNAL CLAIM is a faithful representation of an INTERNAL FACT.
-- "Faithful" means the claim accurately represents the fact without distortion.
-- "Mutated" means the claim distorts, exaggerates, omits critical context, or misrepresents the fact.
+TASK: Judge if an EXTERNAL CLAIM faithfully represents an INTERNAL FACT.
+- "Faithful" = accurate, no distortion
+- "Mutated" = distorted, exaggerated, or missing key context
 
-INPUT YOU WILL RECEIVE:
-- The internal fact (ground truth)
-- The external claim being evaluated
-- All previous debate turns (what other jurors have said)
-- Your turn number and round number
+DEBATE RULES:
+- Keep it short and punchy - 2-3 sentences max per point
+- Be conversational, like you're chatting with colleagues
+- React to what others said - agree, push back, build on ideas
+- Stay in character but don't be verbose
+- Call out specific words/numbers that matter
 
-YOUR OUTPUT:
-Provide a clear, compelling argument from YOUR persona's perspective.
-- Stay in character with your persona
-- Reference and respond to what previous jurors have said
-- Be specific about WHY you think the claim is faithful or mutated
-- Highlight specific phrases, numbers, or context that support your view
-
-Keep your response focused and impactful (2-4 paragraphs maximum).
+OUTPUT: One concise, impactful contribution (1-2 short paragraphs). Get to the point fast.
 """
     
     return build_agent(
@@ -98,33 +90,35 @@ Keep your response focused and impactful (2-4 paragraphs maximum).
     )
 
 
-def build_moderator_summary_agent(model: str = DEFAULT_OPENAI_MODEL) -> AgentHandle:
-    """Build the moderator agent for mid-debate summaries."""
+def build_moderator_agent(model: str = "gpt-5.2") -> AgentHandle:
+    """Build the single Moderator agent for summaries and guidance."""
     instructions = """You are the Moderator of a fact-checking jury debate.
 
-YOUR TASK:
-After the first round of debate, you must summarize the discussion and set the tone for the next round.
+YOUR ROLE:
+You facilitate the debate - summarizing discussions, highlighting key tensions, and guiding jurors toward productive dialogue. You do NOT deliver final verdicts.
+
+WHEN CALLED:
+You will be asked to summarize after Round 1 and can also provide guidance after Round 2 if needed.
 
 INPUT YOU WILL RECEIVE:
 - The internal fact (ground truth)
 - The external claim being evaluated
-- All turns from Round 1 of the debate
+- All debate turns so far
+- The phase of debate (after round 1 or after round 2)
 
-YOUR OUTPUT:
-Provide a ModeratorSummary with:
-1. A concise summary of the arguments made so far
-2. Key points raised by the jurors
-3. Areas where jurors agree
-4. Areas where jurors disagree
-5. Guidance for the next round - what should jurors focus on or address?
+YOUR OUTPUT (ModeratorSummary):
+1. summary: Concise recap of arguments so far
+2. key_points: Main points raised by jurors
+3. areas_of_agreement: Where jurors align
+4. areas_of_disagreement: Where jurors clash
+5. guidance_for_next_round: What to focus on next (or final observations if after round 2)
 
-Be neutral and fair. Your job is to help structure the debate, not to take sides.
-Keep the guidance constructive and specific.
+Be neutral, fair, and constructive. Your job is to structure the debate, not judge it.
 """
     
     return build_agent(
         AgentDefinition(
-            name="moderator_summary",
+            name="moderator",
             model=model,
             output_type=ModeratorSummary,
             instructions=instructions,
@@ -132,36 +126,38 @@ Keep the guidance constructive and specific.
     )
 
 
-def build_moderator_verdict_agent(model: str = DEFAULT_OPENAI_MODEL) -> AgentHandle:
-    """Build the moderator agent for final verdict."""
-    instructions = """You are the Moderator of a fact-checking jury debate, delivering the FINAL VERDICT.
+def build_final_judge_agent(model: str = "gpt-5.2") -> AgentHandle:
+    """Build the Final Judge agent for delivering the verdict."""
+    instructions = """You are the Final Judge of a fact-checking jury debate.
+
+YOUR ROLE:
+You are separate from the Moderator. After the jury has debated and the Moderator has summarized, YOU deliver the final, authoritative verdict.
 
 YOUR TASK:
-After all debate rounds, you must weigh the arguments and deliver a final verdict.
+Weigh all arguments from the debate and render a definitive judgment on whether the claim is faithful to the original fact.
 
 INPUT YOU WILL RECEIVE:
 - The internal fact (ground truth)
 - The external claim being evaluated
 - All debate turns from both rounds
-- The mid-debate summary you provided
+- The Moderator's summary and observations
 
-YOUR OUTPUT:
-Provide a ModeratorFinalVerdict with:
+YOUR OUTPUT (ModeratorFinalVerdict):
 1. label: "Faithful", "Mutated", or "Unclear"
-2. confidence: 0.0 to 1.0 (how confident you are)
-3. summary: A brief summary of your decision
-4. rationale_bullets: 3-5 key reasons for your verdict
-5. key_arguments_for_faithful: Best arguments made for "Faithful"
-6. key_arguments_for_mutated: Best arguments made for "Mutated"
-7. final_reasoning: Your detailed reasoning for the verdict
+2. confidence: 0.0 to 1.0 (your certainty level)
+3. summary: Brief summary of your decision
+4. rationale_bullets: 3-5 key reasons supporting your verdict
+5. key_arguments_for_faithful: Strongest pro-faithful arguments from debate
+6. key_arguments_for_mutated: Strongest pro-mutated arguments from debate
+7. final_reasoning: Your detailed reasoning explaining the verdict
 
-Be fair and consider all perspectives. Acknowledge dissenting views.
-Your verdict should be well-reasoned and defensible.
+Be fair, thorough, and decisive. Consider all perspectives but ultimately render a clear judgment.
+Your verdict is final and must be well-reasoned and defensible.
 """
     
     return build_agent(
         AgentDefinition(
-            name="moderator_verdict",
+            name="final_judge",
             model=model,
             output_type=ModeratorFinalVerdict,
             instructions=instructions,
@@ -171,7 +167,7 @@ Your verdict should be well-reasoned and defensible.
 
 def build_hackathon_registry(
     personas: list[JurorPersona] | None = None,
-    model: str = DEFAULT_OPENAI_MODEL,
+    model: str = "gpt-5.2",
 ) -> HackathonAgentRegistry:
     """Build the complete agent registry for the hackathon."""
     if personas is None:
@@ -184,6 +180,6 @@ def build_hackathon_registry(
     
     return HackathonAgentRegistry(
         jurors=jurors,
-        moderator_summary=build_moderator_summary_agent(model),
-        moderator_verdict=build_moderator_verdict_agent(model),
+        moderator=build_moderator_agent(model),
+        final_judge=build_final_judge_agent(model),
     )

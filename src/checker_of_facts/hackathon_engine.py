@@ -138,9 +138,9 @@ def print_moderator_summary(summary: ModeratorSummary) -> None:
 
 
 def print_final_verdict(verdict: ModeratorFinalVerdict) -> None:
-    """Print the moderator's final verdict."""
+    """Print the final judge's verdict."""
     print(f"\n{Colors.BOLD}{'═' * 60}{Colors.END}")
-    print(f"{Colors.BOLD}⚖️  FINAL VERDICT{Colors.END}")
+    print(f"{Colors.BOLD}👨‍⚖️  FINAL JUDGE - VERDICT{Colors.END}")
     print(f"{Colors.BOLD}{'═' * 60}{Colors.END}\n")
     
     # Verdict label with color
@@ -188,7 +188,7 @@ class HackathonDebateEngine:
         registry: HackathonAgentRegistry | None = None,
         runner: RunnerProtocol | None = None,
         personas: list[JurorPersona] | None = None,
-        model: str = "gpt-4.1-mini",
+        model: str = "gpt-5.2",
         verbose: bool = True,
     ):
         self.model = model
@@ -288,9 +288,9 @@ class HackathonDebateEngine:
         )
         
         # ═══════════════════════════════════════════════════════════
-        # FINAL VERDICT: Moderator delivers conclusion
+        # FINAL VERDICT: Final Judge delivers conclusion
         # ═══════════════════════════════════════════════════════════
-        final_verdict = await self._run_moderator_verdict(
+        final_verdict = await self._run_final_judge_verdict(
             pair=pair,
             all_turns=round1_turns + round2_turns,
             moderator_summary=moderator_summary,
@@ -378,7 +378,7 @@ class HackathonDebateEngine:
         }
         
         result = await self.runner.run(
-            self.registry.moderator_summary,
+            self.registry.moderator,
             json.dumps(input_data),
             max_turns=4,
         )
@@ -397,13 +397,13 @@ class HackathonDebateEngine:
                 guidance_for_next_round="Continue debating.",
             )
     
-    async def _run_moderator_verdict(
+    async def _run_final_judge_verdict(
         self,
         pair: ClaimTruthPair,
         all_turns: list[DebateTurn],
         moderator_summary: ModeratorSummary,
     ) -> ModeratorFinalVerdict:
-        """Run the moderator final verdict."""
+        """Run the final judge to deliver the verdict."""
         input_data = {
             "internal_fact": pair.truth,
             "external_claim": pair.claim,
@@ -412,7 +412,7 @@ class HackathonDebateEngine:
         }
         
         result = await self.runner.run(
-            self.registry.moderator_verdict,
+            self.registry.final_judge,
             json.dumps(input_data),
             max_turns=4,
         )
